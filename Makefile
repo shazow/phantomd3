@@ -2,4 +2,5 @@ start:
 	phantomjs server.js
 
 request:
-	curl -F d3=@renderExample.js localhost:8000
+	curl -vv -d @example_request.js localhost:8000
+	open foo.png

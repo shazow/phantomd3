@@ -18,7 +18,6 @@ function renderElement(page, selector) {
 console.log("Starting server on port " + PORT + ".");
 webserver.create().listen(PORT, function(request, response) {
     // TODO: Add some kind of security here?
-    console.log("Enter");
     var render_fn = request.post && request.post['src'];
     var page = webpage.create();
 

@@ -1,47 +1,48 @@
 var webserver = require('webserver');
 var webpage = require('webpage');
 
-// TODO: Do this inside of the request and chain events?
-var page = webpage.create();
-page.open('./d3shell.html');
 
-function render_element(page, selector) {
-    var prevClipRect = page.clipRect;
+var PORT = 8000;
 
+
+function renderElement(page, selector) {
     page.clipRect = page.evaluate(function(selector) {
         return document.querySelector(selector).getBoundingClientRect();
     }, selector);
 
-    page.render('foo.png');
-
-    //var pic = page.renderBase64('png');
-    page.clipRect = prevClipRect;
-    //return pic;
+    var pic = page.renderBase64('png');
+    return pic;
 };
 
-webserver.create().listen(8000, function(request, response) {
+
+console.log("Starting server on port " + PORT + ".");
+webserver.create().listen(PORT, function(request, response) {
     // TODO: Add some kind of security here?
-    page.evaluate(new Function(request.postRaw));
+    console.log("Enter");
+    var render_fn = request.post && request.post['src'];
+    var page = webpage.create();
 
-    console.log("Rendering... ");
-    var r = render_element(page, '#viewport');
-    console.log("Done.");
+    page.open('d3shell.html', function(status) {
+        if (render_fn) {
+            this.evaluate(new Function(render_fn));
+        }
 
-    if (r) {
-        response.statusCode = 200;
-        response.headers = {
-            'Cache': 'no-cache',
-            'Content-Type': 'image/png'
-        };
-        response.setEncoding('binary');
-        response.write(atob(page.renderBase64('png')));
-    } else {
-        response.statusCode = 500;
-        response.write("Something went wrong.");
-    }
+        var r = renderElement(this, '#viewport');
 
-    response.close();
+        if (r) {
+            response.statusCode = 200;
+            response.headers = {
+                'Cache': 'no-cache',
+                'Content-Type': 'image/png'
+            };
+            response.setEncoding('binary');
+            response.write(atob(this.renderBase64('png')));
+        } else {
+            response.statusCode = 500;
+            response.write("Something went wrong.");
+        }
 
-    // FIXME: Close the page to avoid memory leaks?
-    //page.close();
+        response.close();
+        this.close();
+    });
 });

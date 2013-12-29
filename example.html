@@ -2,7 +2,18 @@
     <body>
 
         <form method="post" action="http://localhost:8000/">
-            <textarea name="d3"></textarea>
+            <textarea name="src" cols="80" rows="10">
+d3.select("#viewport")
+  .append("svg")
+  .attr("width", 100)
+  .attr("height", 100)
+  .append("circle")
+  .style("stroke", "gray")
+  .style("fill", "white")
+  .attr("r", 40)
+  .attr("cx", 50)
+  .attr("cy", 50);
+            </textarea>
             <input type="submit" />
         </form>
     </body>

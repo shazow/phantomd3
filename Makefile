@@ -1,4 +1,4 @@
-start:
+serve:
 	phantomjs server.js
 
 request:

@@ -25,26 +25,34 @@ function renderElement(page, selector) {
 };
 
 
-console.log("Starting server on port " + PORT + ".");
+console.log("-> Starting server on port " + PORT + ".");
 webserver.create().listen(PORT, function(request, response) {
     console.log(request.method + ' ' + request.url);
 
-    if (request.method != 'POST' || request.url != '/') {
-        response.statusCode = 404;
-        response.close();
-        return;
-    }
+    //if (request.method != 'POST' || request.url != '/') {
+        //response.statusCode = 404;
+        //response.close();
+        //return;
+    //}
 
     // TODO: Add some kind of security here?
     var render_fn = request.post && request.post['src'];
     var page = webpage.create();
 
     page.open('shell.html', function(status) {
-        if (render_fn) {
-            this.evaluate(new Function(render_fn));
+        if (status != 'success') {
+            console.log("Failed to load shell page, status: " + status);
+            page.close();
+            response.close();
+            return
         }
 
-        var r = renderElement(this, '#viewport');
+        if (render_fn) {
+            page.evaluate(new Function(render_fn));
+        }
+
+        var r = renderElement(page, '#viewport');
+        //page.close();
 
         if (r) {
             response.statusCode = 200;
@@ -60,6 +68,5 @@ webserver.create().listen(PORT, function(request, response) {
         }
 
         response.close();
-        this.close();
     });
 });

@@ -51,22 +51,24 @@ webserver.create().listen(PORT, function(request, response) {
             page.evaluate(new Function(render_fn));
         }
 
-        var r = renderElement(page, '#viewport');
-        //page.close();
+        setTimeout(function() {
+            var r = renderElement(page, '#viewport');
+            page.close();
 
-        if (r) {
-            response.statusCode = 200;
-            response.headers = {
-                'Cache': 'no-cache',
-                'Content-Type': 'image/png'
-            };
-            response.setEncoding('binary');
-            response.write(atob(r));
-        } else {
-            response.statusCode = 500;
-            response.write("No image rendered after evaluating: \n" + render_fn);
-        }
+            if (r) {
+                response.statusCode = 200;
+                response.headers = {
+                    'Cache': 'no-cache',
+                    'Content-Type': 'image/png'
+                };
+                response.setEncoding('binary');
+                response.write(atob(r));
+            } else {
+                response.statusCode = 500;
+                response.write("No image rendered after evaluating: \n" + render_fn);
+            }
 
-        response.close();
+            response.close();
+        }, 10);
     });
 });

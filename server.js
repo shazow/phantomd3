@@ -29,11 +29,11 @@ console.log("-> Starting server on port " + PORT + ".");
 webserver.create().listen(PORT, function(request, response) {
     console.log(request.method + ' ' + request.url);
 
-    //if (request.method != 'POST' || request.url != '/') {
-        //response.statusCode = 404;
-        //response.close();
-        //return;
-    //}
+    if (request.method != 'POST' || request.url != '/') {
+        response.statusCode = 404;
+        response.close();
+        return;
+    }
 
     // TODO: Add some kind of security here?
     var render_fn = request.post && request.post['src'];
